@@ -1,6 +1,41 @@
 import React, { Component } from 'react';
 
 
+// SVG SHAPES
+
+const min = '-';
+const bond = '~';
+const more = '<';
+
+const SVG_MIN = scale => (
+  <line
+    stroke="black"
+    strokeWidth="2"
+    x1="0" x2={scale}
+    y1 = "0" y2={scale}
+  />
+);
+
+const SVG_BOND = (
+  <line
+    stroke="black"
+    strokeWidth="2"
+    x1="0" x2="1"
+    y1 = "0" x2="1"
+  />
+);
+
+const SVG_MORE = (
+  <line
+    stroke="black"
+    strokeWidth="2"
+    x1="0" x2="1"
+    y1 = "0" x2="1"
+  />
+);
+
+
+// 0 <= x <= 1
 const mapToBond = x => {
   const a = biForkate(x, 0.5);
   if (a <= 0.5) { return '-'; }
@@ -18,6 +53,12 @@ const biForkate = (a, b) => {
   }
   return b;
 }
+
+const mapToSVGShape = x => {
+  const min = SVG_MIN;
+  return SVG_MIN;
+}
+
 
 export default class App extends Component {
   state = {
@@ -37,11 +78,13 @@ export default class App extends Component {
     const c = m(biForkate(b, 0.5));
 
     return (
-      <div onClick={() => this.turn()}>
-        <div>{a}</div>
-        <div>{b}</div>
-        <div>{c}</div>
-      </div>
+      <svg onClick={() => this.turn()}>
+        <g transform="scale(1)">
+          {SVG_MIN(20)}
+          {mapToSVGShape(SVG_BOND)}
+          {mapToSVGShape(SVG_MORE)}
+        </g>
+      </svg>
     );
   }
 }
