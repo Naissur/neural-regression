@@ -5,7 +5,13 @@ import React, { Component } from 'react';
 
 const min = '-';
 const bond = '~';
-const more = '<';
+const fork = '<';
+
+const pickWithChoice = (arr, num) => {
+  const length = arr.length;
+  const choice = Math.floor([num * length]); // ^ +
+  return arr[choice];
+}
 
 const SVG_MIN = scale => (
   <line
@@ -25,7 +31,7 @@ const SVG_BOND = scale => (
   />
 );
 
-const SVG_MORE = scale => (
+const SVG_FORK = scale => (
   <g>
     <line
       stroke="black"
@@ -63,8 +69,10 @@ const biForkate = (a, b) => {
 }
 
 const mapToSVGShape = x => {
-  const min = SVG_MIN;
-  return SVG_MIN;
+  if (x <= 0.5) { return SVG_MIN; }
+  if (x <= 0.25) { return SVG_BOND; }
+
+  return SVG_FORK;
 }
 
 
@@ -79,21 +87,25 @@ export default class App extends Component {
 
   render() {
     const choice = this.state.x;
-    const m = x => mapToBond(x);
 
-    const a = m(biForkate(choice, 0.5));
-    const b = m(biForkate(a, 0.5));
-    const c = m(biForkate(b, 0.5));
+    const scale = 300;
 
-    const scale = 20;
-    const A = biForkate(a, SVG_MIN(scale));
-    const B = biForkate(b, SVG_BOND(scale));
-    const C = biForkate(c, SVG_MORE(scale));
+    const TriFork = choice;
+
+    const SHAPE = (pickWithChoice([SVG_MIN, SVG_BOND, SVG_FORK], choice))(scale);
+
+    console.log(SHAPE);
+
+    const pX = (Math.random() + 1) * scale / 4;
+    const pY = (Math.random() + 1) * scale / 4;
 
     return (
-      <svg onClick={() => this.turn()}>
-        <g transform="translate(20, 20)">
-          {A} {B} {C}
+      <svg
+        style={{ width: scale, height: scale, border: '1px solid #000' }}
+        onMouseMove={() => this.turn()}
+      >
+        <g transform={`translate(${pX}, ${pY})`}>
+          {SHAPE}
         </g>
       </svg>
     );
