@@ -51,8 +51,26 @@ const SVG_BOND = scale => (
     <line
       stroke="black"
       strokeWidth="2"
-      x1="0" x2="0"
-      y1="0" y2={scale}
+      x1="0" y1="0" 
+      x2={scale / 4} y2={scale / 4}
+    />
+    <line
+      stroke="black"
+      strokeWidth="2"
+      x1={scale / 4} y1={scale / 4}
+      x2="0" y2={scale / 2}
+    />
+    <line
+      stroke="black"
+      strokeWidth="2"
+      x1="0" y1={scale / 2}
+      x2={-scale / 4} y2={scale * 3 / 4}
+    />
+    <line
+      stroke="black"
+      strokeWidth="2"
+      x1={-scale / 4} y1={scale * 3 / 4}
+      x2={0} y2={scale}
     />
     <circle
       cx="0" cy={scale} r="6"
