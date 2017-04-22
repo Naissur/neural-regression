@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 
 
-const lessThan = (x, point) => {
-  if (x <= point) { return 0; }
-  return 1;
-}
-
 const mapToBond = x => {
   const a = biForkate(x, 0.5);
   if (a <= 0.5) { return '-'; }
@@ -35,23 +30,17 @@ export default class App extends Component {
 
   render() {
     const choice = this.state.x;
+    const m = x => mapToBond(x);
 
-    const a = biForkate(choice, 0.5);
-    const b = biForkate(a, 0.5);
-    const c = biForkate(b, 0.5);
-
-    console.log(a,b,c);
-
-    const A = mapToBond(a);
-    const B = mapToBond(b);
-    const C = mapToBond(c);
-
+    const a = m(biForkate(choice, 0.5));
+    const b = m(biForkate(a, 0.5));
+    const c = m(biForkate(b, 0.5));
 
     return (
       <div onClick={() => this.turn()}>
-        <div>{mapToBond(A)}</div>
-        <div>{mapToBond(B)}</div>
-        <div>{mapToBond(C)}</div>
+        <div>{a}</div>
+        <div>{b}</div>
+        <div>{c}</div>
       </div>
     );
   }
