@@ -22,7 +22,7 @@ const pickWithChoice = (arr, num) => {
 
 const SVG_FACT = (
   <circle
-    cx="0" cy="0" r="6"
+    cx="0" cy="0" r="3"
 
     stroke="black"
     strokeWidth="2"
@@ -31,31 +31,40 @@ const SVG_FACT = (
 
 const SVG_MIN = scale => (
   <g>
-    {SVG_FACT}
     <line
       stroke="black"
       strokeWidth="2"
       x1="0" x2={-scale}
       y1 = "0" y2="0"
     />
+    <circle
+      cx={-scale} cy="0" r="6"
+
+      stroke="black"
+      strokeWidth="2"
+    />
   </g>
 );
 
 const SVG_BOND = scale => (
   <g>
-    {SVG_FACT}
     <line
       stroke="black"
       strokeWidth="2"
       x1="0" x2="0"
       y1="0" y2={scale}
     />
+    <circle
+      cx="0" cy={scale} r="6"
+
+      stroke="black"
+      strokeWidth="2"
+    />
   </g>
 );
 
 const SVG_FORK = scale => (
   <g>
-    {SVG_FACT}
     <line
       stroke="black"
       strokeWidth="2"
@@ -67,6 +76,17 @@ const SVG_FORK = scale => (
       strokeWidth="2"
       x1="0" x1={scale}
       y2="0" y1="0"
+    />
+    <circle
+      cx={scale} cy="0" r="6"
+      stroke="black"
+      strokeWidth="2"
+    />
+    <circle
+      cx="0" cy={-scale} r="6"
+
+      stroke="black"
+      strokeWidth="2"
     />
   </g>
 );
@@ -101,7 +121,7 @@ const mapToSVGShape = x => {
 
 export default class App extends Component {
   state = {
-    x: 0.5,
+    shapeType: 0.3,
     mX: 0,
     mY: 0
   }
@@ -111,34 +131,25 @@ export default class App extends Component {
     this.setState({ mX: ev.clientX, mY: ev.clientY });
   }
 
-  turn(x, y) {
-    const { mX, mY } = this.state;
-
-    raf(() => {
-      this.setState({
-        x: Math.random()
-      });
-    });
+  handleMouseDown() {
+    this.setState({ shapeType: Math.random() });
   }
 
   render() {
-    const { mX, mY } = this.state;
+    const { mX, mY, shapeType } = this.state;
 
     const choice = Math.random();
-    // const SHAPE = (pickWithChoice([SVG_MIN, SVG_BOND, SVG_FORK], choice))(MAX_SCALE);
+    const SHAPE = (pickWithChoice([SVG_MIN, SVG_BOND, SVG_FORK], shapeType))(MAX_SCALE);
 
     return (
       <svg
         style={{ width: MAX_BOUNDS, height: MAX_BOUNDS, border: '1px solid #000', cursor: 'none' }}
         onMouseMove={::this.handleMouseMove}
+        onMouseDown={::this.handleMouseDown}
       >
-        <circle
-          cx={mX} cy={mY} r="6"
-          stroke="black"
-          strokeWidth="2"
-        />
         <g transform={`translate(${mX}, ${mY}) rotate(${(mX + mY) % 360})`}>
-          {SVG_BOND(MAX_SCALE)}
+          {SVG_FACT}
+          {SHAPE}
         </g>
       </svg>
     );
