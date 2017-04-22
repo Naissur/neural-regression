@@ -11,27 +11,35 @@ const SVG_MIN = scale => (
   <line
     stroke="black"
     strokeWidth="2"
-    x1="0" x2={scale}
-    y1 = "0" y2={scale}
+    x1="0" x2={-scale}
+    y1 = "0" y2="0"
   />
 );
 
-const SVG_BOND = (
+const SVG_BOND = scale => (
   <line
     stroke="black"
     strokeWidth="2"
-    x1="0" x2="1"
-    y1 = "0" x2="1"
+    x1="0" x2="0"
+    y1="0" y2={scale}
   />
 );
 
-const SVG_MORE = (
-  <line
-    stroke="black"
-    strokeWidth="2"
-    x1="0" x2="1"
-    y1 = "0" x2="1"
-  />
+const SVG_MORE = scale => (
+  <g>
+    <line
+      stroke="black"
+      strokeWidth="2"
+      x1="0" x2="0"
+      y1 = "0" y2={-scale}
+    />
+    <line
+      stroke="black"
+      strokeWidth="2"
+      x1="0" x1={scale}
+      y2="0" y1="0"
+    />
+  </g>
 );
 
 
@@ -79,10 +87,10 @@ export default class App extends Component {
 
     return (
       <svg onClick={() => this.turn()}>
-        <g transform="scale(1)">
+        <g transform="translate(20, 20)">
+          {SVG_BOND(20)}
           {SVG_MIN(20)}
-          {mapToSVGShape(SVG_BOND)}
-          {mapToSVGShape(SVG_MORE)}
+          {SVG_MORE(20)}
         </g>
       </svg>
     );
