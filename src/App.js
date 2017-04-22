@@ -85,12 +85,15 @@ export default class App extends Component {
     const b = m(biForkate(a, 0.5));
     const c = m(biForkate(b, 0.5));
 
+    const scale = 20;
+    const A = biForkate(a, SVG_MIN(scale));
+    const B = biForkate(b, SVG_BOND(scale));
+    const C = biForkate(c, SVG_MORE(scale));
+
     return (
       <svg onClick={() => this.turn()}>
         <g transform="translate(20, 20)">
-          {SVG_BOND(20)}
-          {SVG_MIN(20)}
-          {SVG_MORE(20)}
+          {A} {B} {C}
         </g>
       </svg>
     );
