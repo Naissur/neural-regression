@@ -34,13 +34,12 @@ export default class App extends Component {
     reset();
   }
 
-  moveFocus() {
-    const focus = Math.random();
-    A.activate(focus);
+  moveFocus(x) {
+    A.activate(x);
 
     const fact = B.activate();
 
-    this.setState({ focus, fact });
+    this.setState({ focus: x, fact });
   }
 
   learn() {
@@ -67,12 +66,20 @@ export default class App extends Component {
 
     return (
       <div>
-        <div>Focus: {focus.toFixed(2)}</div>
+        Focus:
+        <input
+          type="range"
+          value={focus}
+          max="1"
+          min="0"
+          step="0.01"
+          onChange={ev => this.moveFocus(Number(ev.target.value))}
+        />
+        <div>A = {focus.toFixed(2)}</div>
+
         <div>Fact: {fact.toFixed(2)}</div>
         <div>Connection weight: {connection.weight.toFixed(2)}</div>
-        <button onClick={() => this.moveFocus()}>
-          Move focus
-        </button>
+
         <button onClick={() => this.learn()}>
           Train on focus
         </button>
