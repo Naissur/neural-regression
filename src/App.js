@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import raf from 'raf';
 
 
-const MAX_BOUNDS = 300;
+const MAX_BOUNDS = 600;
 const MAX_SCALE = 100;
 const MIN_DERIVATION = 100;
 
@@ -141,7 +141,8 @@ export default class App extends Component {
   state = {
     shapeType: 0.3,
     mX: 0,
-    mY: 0
+    mY: 0,
+    lastPoint : { x: 0, y: 0 }
   }
 
 
@@ -150,14 +151,36 @@ export default class App extends Component {
   }
 
   handleMouseDown() {
-    this.setState({ shapeType: Math.random() });
+    const shapeType = Math.random();
+
+    this.setState({ shapeType });
+
+    this.turn({
+      pX: this.state.mX,
+      pY: this.state.mY,
+      shapeType
+    })
+  }
+
+  turn({ pX, pY, type }) {
+    const point = {
+      x: pX,
+      y: pY,
+      shapeType
+    };
+
+    const { mx, my } = this.state;
+
+    this.setState({ lastPoint: { x: mX, y: mY, shapeType: Math.random() }});
   }
 
   render() {
-    const { mX, mY, shapeType } = this.state;
+    const { mX, mY, shapeType, points, lastPoint } = this.state;
 
     const choice = Math.random();
     const SHAPE = (pickWithChoice([SVG_MIN, SVG_BOND, SVG_FORK], shapeType))(MAX_SCALE);
+
+    const LAST_SHAPE = SVG_BOND; // (pickWithChoice([SVG_MIN, SVG_BOND, SVG_FORK], lastPoint.shapeType || shapeType))(MAX_SCALE / 2);
 
     return (
       <svg
@@ -165,9 +188,12 @@ export default class App extends Component {
         onMouseMove={::this.handleMouseMove}
         onMouseDown={::this.handleMouseDown}
       >
-        <g transform={`translate(${mX}, ${mY}) rotate(${(mX + mY) % 360})`}>
+        <g transform={`translate(${mX}, ${mY}) rotate(${(mX * mY / MAX_BOUNDS) * 2  + 180 })`}>
           {SVG_FACT}
           {SHAPE}
+        </g>
+        <g transform={`translate(${lastPoint.x}, ${lastPoint.y}) rotate(${(lastPoint.x + lastPoint.y) % 360})`}>
+          {LAST_SHAPE}
         </g>
       </svg>
     );
