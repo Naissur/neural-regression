@@ -22,8 +22,8 @@ reset();
 
 export default class App extends Component {
   state = {
-    focus: A.activate(),
-    fact: B.activate()
+    a: A.activate(),
+    b: B.activate()
   }
 
   componentWillMount() {
@@ -34,54 +34,70 @@ export default class App extends Component {
     reset();
   }
 
-  moveFocus(x) {
+  setA(x) {
     A.activate(x);
 
-    const fact = B.activate();
+    const b = B.activate();
 
-    this.setState({ focus: x, fact });
+    this.setState({ a: x, b });
+  }
+
+  setB(x) {
+    B.activate(x);
+
+    this.setState({ b: x });
   }
 
   learn() {
-    const { focus } = this.state;
+    const { a } = this.state;
 
     const learningRate = 0.3;
 
     for(var i = 0; i < 100; i++) {
-      // when A activates focus
-      A.activate(focus);
+      // when A activates a
+      A.activate(a);
 
-      // train B to activate focus
+      // train B to activate a
       B.activate();
-      B.propagate(learningRate, focus);
+      B.propagate(learningRate, a);
     }
 
-    const fact = B.activate();
+    const b = B.activate();
 
-    this.setState({ focus, fact });
+    this.setState({ a, b });
   }
 
   render() {
-    const { focus, fact } = this.state;
+    const { a, b } = this.state;
 
     return (
       <div>
-        Focus:
+        A = {a.toFixed(2)}
         <input
           type="range"
-          value={focus}
+          value={a}
           max="1"
           min="0"
           step="0.01"
-          onChange={ev => this.moveFocus(Number(ev.target.value))}
+          onChange={ev => this.setA(Number(ev.target.value))}
         />
-        <div>A = {focus.toFixed(2)}</div>
 
-        <div>Fact: {fact.toFixed(2)}</div>
+        <br />
+
+        B = {b.toFixed(2)}
+        <input
+          type="range"
+          value={b}
+          max="1"
+          min="0"
+          step="0.01"
+          onChange={ev => this.setB(Number(ev.target.value))}
+        />
+
         <div>Connection weight: {connection.weight.toFixed(2)}</div>
 
         <button onClick={() => this.learn()}>
-          Train on focus
+          Enforce
         </button>
         <button onClick={() => this.reset()}>
           Reset
