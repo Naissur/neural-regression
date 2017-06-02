@@ -17,112 +17,46 @@ reset();
 
 export default class App extends Component {
   state = {
-    a: 0.5,
-    b: 0.5,
-    enforcing: true
+    points: [ { x: 0, y: 0 } ],
   }
 
-  componentWillMount() {
-    reset();
+  handleMouseDown(ev) {
+    const { clientX, clientY } = ev;
+    const point = { x: clientX - 8, y: clientY - 8 };
+
+    const newPoints = this.state.points.concat(point);
+
+    this.setState({ points: newPoints });
   }
 
-  reset() {
-    reset();
-  }
-
-  setA(a) {
-    const { enforcing } = this.state;
-
-    if (!enforcing) {
-      this.setState({ a });
-      return;
-    }
-
-    const [ out ] = NETWORK.activate([a]);
-    this.setState({ a, b: out });
-  }
-
-  setB(b) {
-    const { enforcing } = this.state;
-
-    if (!enforcing) {
-      this.setState({ b });
-      return;
-    }
-
-    const [ out ] = NETWORK.activate([b]);
-    this.setState({ a: out, b });
-  }
-
-  enforce() {
-    const { a, b } = this.state;
-
-    var trainingSet = [ {
-      input: [a],
-      output: [b]
-    } ];
-
-    TRAINER.train(trainingSet, {
-      rate: 0.1,
-      iterations: 60
-    });
-
-    const [ out ] = NETWORK.activate([ a ]);
-
-    this.setState({ a: out, b: out });
-  }
-
-  toggleEnforcing() {
-    this.setState({ enforcing: !this.state.enforcing });
+  clearPoints() {
+    this.setState({ points: [] });
   }
 
   render() {
-    const { a, b } = this.state;
+    const { points } = this.state;
 
     return (
       <div>
-        A = {a.toFixed(2)}
-        <input
-          type="range"
-          value={a}
-          max="1"
-          min="0"
-          step="0.01"
-          onChange={ev => this.setA(Number(ev.target.value))}
-        />
+        <svg
+          width={200}
+          height={200}
+          style={{ border: '1px solid #000' }}
+          onMouseDown={ev => this.handleMouseDown(ev)}
+        >
+          {points.map((point, index) => (
+            <circle
+              key={index}
+              cx={point.x}
+              cy={point.y}
+              r={4}
+              fill='black'
+            />
+          ))}
+        </svg>
 
         <br />
-
-        B = {b.toFixed(2)}
-        <input
-          type="range"
-          value={b}
-          max="1"
-          min="0"
-          step="0.01"
-          onChange={ev => this.setB(Number(ev.target.value))}
-        />
-
-        <br />
-        <br />
-
-        <label>
-          <input
-            type="checkbox"
-            value={this.state.enforcing}
-            onChange={ev => this.toggleEnforcing()}
-          />
-          Enforcing mode
-        </label>
-
-        <br />
-
-        <button onClick={() => this.enforce()}>
-          Enforce
-        </button>
-        <button onClick={() => this.reset()}>
-          Reset
-        </button>
+        <button onClick={() => this.clearPoints()}>Clear</button>
       </div>
     );
   }
