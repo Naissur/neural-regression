@@ -39,11 +39,23 @@ export default class App extends Component {
 
   // NETWORK
 
-  getPlottedPattern() {
+  trainOnPoints() {
     const { points } = this.state;
 
-    // points are training data !!
+    const trainingData = points.map(
+      ({ x, y }) => ({ x: x / SVG_WIDTH, y: y / SVG_WIDTH })
+    ).map(
+      ({ x, y }) => ({
+        input: [x],
+        output: [y]
+      })
+    );
 
+    TRAINER.train(trainingData);
+  }
+
+  getPlottedPattern() {
+    const { points } = this.state;
 
     // get range
     let range = [];
@@ -95,6 +107,7 @@ export default class App extends Component {
 
         <br />
         <button onClick={() => this.clearPoints()}>Clear</button>
+        <button onClick={() => this.trainOnPoints()}>Train</button>
       </div>
     );
   }
