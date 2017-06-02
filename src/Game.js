@@ -5,7 +5,7 @@ import raf from 'raf';
 
 const CELL_WIDTH = 20;
 
-const Cell = ({ active }) => {
+const Cell = ({ active, onClick }) => {
   const color = active? 'black' : 'white';
 
   return(
@@ -16,7 +16,9 @@ const Cell = ({ active }) => {
       height: CELL_WIDTH,
 
       cursor: 'pointer'
-    }}/>
+    }}
+      onClick={onClick}
+    />
   );
 }
 
@@ -41,7 +43,7 @@ export default ({ data }) => {
     <div>
       {data.map((row, index) => (
         <CellRow key={index}>
-          {row.map((cell, i) => <Cell active={cell === 1} key={i}/>)}
+          {row.map((cell, i) => <Cell active={cell > 0.5} key={i}/>)}
         </CellRow>
       ))}
     </div>

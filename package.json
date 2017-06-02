@@ -45,6 +45,7 @@
   "dependencies": {
     "raf": "^3.3.0",
     "react": "^0.14.6",
-    "react-dom": "^0.14.6"
+    "react-dom": "^0.14.6",
+    "synaptic": "^1.0.11"
   }
 }
