@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-
 import raf from 'raf';
-
 
 import { Neuron, Architect, Trainer } from 'synaptic';
 
+
+
+// neural network and trainer
 
 let NETWORK, TRAINER;
 
@@ -17,6 +18,64 @@ function reset() {
 }
 
 reset();
+
+
+
+// React components
+
+const Plot = ({ points, onMouseDown, children }) => (
+  <svg
+    width={SVG_WIDTH}
+    height={SVG_WIDTH}
+    style={{ border: '1px solid #000' }}
+    onMouseDown={onMouseDown}
+  >
+    {points.map((point, index) => (
+      <circle
+        key={index}
+        cx={point.x}
+        cy={point.y}
+        r={4}
+        fill='black'
+      />
+    ))}
+
+    {children}
+  </svg>
+
+);
+
+
+// impure, uses NETWORK
+const RegressionPoints = () => {
+  // get range
+  let range = [];
+
+  for(var i = 0; i < 1; i += PLOT_STEP) {
+    range.push(i)
+  }
+
+
+  // collect outputs
+  const coords = range.map(x => ({ x, fx: NETWORK.activate([x]) }));
+
+  return (
+    <g>
+      {coords.map(
+        ({ x, fx }, index) => (
+          <circle
+            key={index}
+            cx={x * SVG_WIDTH}
+            cy={fx * SVG_WIDTH}
+            r={1}
+            fill='orange'
+          />
+        )
+      )}
+    </g>
+  );
+};
+
 
 export default class App extends Component {
   state = {
@@ -32,7 +91,7 @@ export default class App extends Component {
   }
 
   tick() {
-    this.trainOnPoints();
+    raf(() => this.trainOnPoints());
   }
 
   handleMouseDown(ev) {
@@ -47,7 +106,10 @@ export default class App extends Component {
 
   clearPoints() {
     this.setState({ points: [] });
-    this.forceUpdate();
+  }
+
+  reset() {
+    reset();
   }
 
 
@@ -56,50 +118,23 @@ export default class App extends Component {
   trainOnPoints() {
     const { points } = this.state;
 
-    const trainingData = points.map(
-      ({ x, y }) => ({ x: x / SVG_WIDTH, y: y / SVG_WIDTH })
-    ).map(
-      ({ x, y }) => ({
+    // get training data
+    const trainingData = points
+      .map( ({ x, y }) => ({ x: x / SVG_WIDTH, y: y / SVG_WIDTH }))
+      .map( ({ x, y }) => ({
         input: [x],
         output: [y]
       })
     );
 
+    // train network
     TRAINER.train(trainingData, {
       learningRate: 0.3,
-      iterations: 100
+      iterations: 400
     });
 
-    //TRAINER.train(trainingData);
-
+    // update UI
     this.forceUpdate();
-  }
-
-  getPlottedPattern() {
-    const { points } = this.state;
-
-    // get range
-    let range = [];
-
-    for(var i = 0; i < 1; i += PLOT_STEP) {
-      range.push(i)
-    }
-
-
-    // collect outputs
-    const coords = range.map(x => ({ x, fx: NETWORK.activate([x]) }));
-
-    return coords.map(
-      ({ x, fx }, index) => (
-        <circle
-          key={index}
-          cx={x * SVG_WIDTH}
-          cy={fx * SVG_WIDTH}
-          r={1}
-          fill='orange'
-        />
-      )
-    )
   }
 
   render() {
@@ -107,28 +142,12 @@ export default class App extends Component {
 
     return (
       <div>
-        <svg
-          width={SVG_WIDTH}
-          height={SVG_WIDTH}
-          style={{ border: '1px solid #000' }}
-          onMouseDown={ev => this.handleMouseDown(ev)}
-        >
-          {points.map((point, index) => (
-            <circle
-              key={index}
-              cx={point.x}
-              cy={point.y}
-              r={4}
-              fill='black'
-            />
-          ))}
-
-          {this.getPlottedPattern()}
-        </svg>
-
+        <Plot points={points} onMouseDown={ev => this.handleMouseDown(ev)}>
+          <RegressionPoints />
+        </Plot>
         <br />
         <button onClick={() => this.clearPoints()}>Clear</button>
-        <button onClick={() => this.trainOnPoints()}>Train</button>
+        <button onClick={() => this.reset()}>Reset</button>
       </div>
     );
   }
