@@ -8,8 +8,8 @@ import { Neuron, Architect, Trainer } from 'synaptic';
 
 let NETWORK, TRAINER;
 
-const SVG_WIDTH = 200;
-const PLOT_STEP = 0.01;
+const SVG_WIDTH = 400;
+const PLOT_STEP = 0.004;
 
 function reset() {
   NETWORK = new Architect.Perceptron(1,4,4,1);
@@ -23,6 +23,18 @@ export default class App extends Component {
     points: [ { x: 0, y: 0 } ],
   }
 
+  componentDidMount() {
+    this.interval = setInterval(() => this.tick(), 30);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  tick() {
+    this.trainOnPoints();
+  }
+
   handleMouseDown(ev) {
     const { clientX, clientY } = ev;
     const point = { x: clientX - 8, y: clientY - 8 };
@@ -30,10 +42,12 @@ export default class App extends Component {
     const newPoints = this.state.points.concat(point);
 
     this.setState({ points: newPoints });
+    this.trainOnPoints();
   }
 
   clearPoints() {
     this.setState({ points: [] });
+    this.forceUpdate();
   }
 
 
@@ -51,7 +65,14 @@ export default class App extends Component {
       })
     );
 
-    TRAINER.train(trainingData);
+    TRAINER.train(trainingData, {
+      learningRate: 0.3,
+      iterations: 100
+    });
+
+    //TRAINER.train(trainingData);
+
+    this.forceUpdate();
   }
 
   getPlottedPattern() {
