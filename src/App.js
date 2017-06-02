@@ -8,8 +8,11 @@ import { Neuron, Architect, Trainer } from 'synaptic';
 
 let NETWORK, TRAINER;
 
+const SVG_WIDTH = 200;
+const PLOT_STEP = 0.01;
+
 function reset() {
-  NETWORK = new Architect.Perceptron(1,2,1);
+  NETWORK = new Architect.Perceptron(1,4,4,1);
   TRAINER = new Trainer(NETWORK);
 }
 
@@ -33,14 +36,47 @@ export default class App extends Component {
     this.setState({ points: [] });
   }
 
+
+  // NETWORK
+
+  getPlottedPattern() {
+    const { points } = this.state;
+
+    // points are training data !!
+
+
+    // get range
+    let range = [];
+
+    for(var i = 0; i < 1; i += PLOT_STEP) {
+      range.push(i)
+    }
+
+
+    // collect outputs
+    const coords = range.map(x => ({ x, fx: NETWORK.activate([x]) }));
+
+    return coords.map(
+      ({ x, fx }, index) => (
+        <circle
+          key={index}
+          cx={x * SVG_WIDTH}
+          cy={fx * SVG_WIDTH}
+          r={1}
+          fill='orange'
+        />
+      )
+    )
+  }
+
   render() {
     const { points } = this.state;
 
     return (
       <div>
         <svg
-          width={200}
-          height={200}
+          width={SVG_WIDTH}
+          height={SVG_WIDTH}
           style={{ border: '1px solid #000' }}
           onMouseDown={ev => this.handleMouseDown(ev)}
         >
@@ -53,6 +89,8 @@ export default class App extends Component {
               fill='black'
             />
           ))}
+
+          {this.getPlottedPattern()}
         </svg>
 
         <br />
