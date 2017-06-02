@@ -3,27 +3,23 @@ import React, { Component } from 'react';
 import raf from 'raf';
 
 
-import { Neuron } from 'synaptic';
+import { Neuron, Architect, Trainer } from 'synaptic';
 
 
-let A = new Neuron();
-let B = new Neuron();
-let connection = A.project(B);
+let NETWORK, TRAINER;
 
 function reset() {
-  A = new Neuron();
-  B = new Neuron();
-  connection = A.project(B);
-
-  A.activate(0.5);
+  NETWORK = new Architect.Perceptron(1,2,1);
+  TRAINER = new Trainer(NETWORK);
 }
 
 reset();
 
 export default class App extends Component {
   state = {
-    a: A.activate(),
-    b: B.activate()
+    a: 0.5,
+    b: 0.5,
+    enforcing: true
   }
 
   componentWillMount() {
@@ -34,37 +30,50 @@ export default class App extends Component {
     reset();
   }
 
-  setA(x) {
-    A.activate(x);
+  setA(a) {
+    const { enforcing } = this.state;
 
-    const b = B.activate();
-
-    this.setState({ a: x, b });
-  }
-
-  setB(x) {
-    B.activate(x);
-
-    this.setState({ b: x });
-  }
-
-  learn() {
-    const { a } = this.state;
-
-    const learningRate = 0.3;
-
-    for(var i = 0; i < 100; i++) {
-      // when A activates a
-      A.activate(a);
-
-      // train B to activate a
-      B.activate();
-      B.propagate(learningRate, a);
+    if (!enforcing) {
+      this.setState({ a });
+      return;
     }
 
-    const b = B.activate();
+    const [ out ] = NETWORK.activate([a]);
+    this.setState({ a, b: out });
+  }
 
-    this.setState({ a, b });
+  setB(b) {
+    const { enforcing } = this.state;
+
+    if (!enforcing) {
+      this.setState({ b });
+      return;
+    }
+
+    const [ out ] = NETWORK.activate([b]);
+    this.setState({ a: out, b });
+  }
+
+  enforce() {
+    const { a, b } = this.state;
+
+    var trainingSet = [ {
+      input: [a],
+      output: [b]
+    } ];
+
+    TRAINER.train(trainingSet, {
+      rate: 0.1,
+      iterations: 60
+    });
+
+    const [ out ] = NETWORK.activate([ a ]);
+
+    this.setState({ a: out, b: out });
+  }
+
+  toggleEnforcing() {
+    this.setState({ enforcing: !this.state.enforcing });
   }
 
   render() {
@@ -94,9 +103,21 @@ export default class App extends Component {
           onChange={ev => this.setB(Number(ev.target.value))}
         />
 
-        <div>Connection weight: {connection.weight.toFixed(2)}</div>
+        <br />
+        <br />
 
-        <button onClick={() => this.learn()}>
+        <label>
+          <input
+            type="checkbox"
+            value={this.state.enforcing}
+            onChange={ev => this.toggleEnforcing()}
+          />
+          Enforcing mode
+        </label>
+
+        <br />
+
+        <button onClick={() => this.enforce()}>
           Enforce
         </button>
         <button onClick={() => this.reset()}>
